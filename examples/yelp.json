@@ -1,0 +1,15 @@
+{
+    "_url": "https://www.yelp.com/search?find_loc=Tallahassee,+FL&cflt=restaurants",
+    "restraunts": ["//li[@class=\"regular-search-result\"]", {
+        "name": "descendant::a[@class=\"biz-name\"]/span/text()",
+        "link": "descendant::a[@class=\"biz-name\"]/@href",
+        "rating": "descendant::div[@class=\"rating-large\"]/i/@title",
+        "num_reviews": "descendant::span[@class=\"review-count rating-qualifier\"]/text()",
+        "price_range": "descendant::span[@class=\"business-attribute price-range\"]/text()",
+        "address": "descendant::address/text()",
+        "phone": "descendant::span[@class=\"biz-phone\"]/text()",
+        "categories": ["descendant::span[@class=\"category-str-list\"]//a", {
+            "category": "text()"
+        }]
+    }]
+}
