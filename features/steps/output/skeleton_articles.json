@@ -1,0 +1,12 @@
+{
+    "articles": [{
+        "article": "London is the capital city of England. It is the most populous\r\n    city in the United Kingdom, with a metropolitan area of over 13\r\n    million inhabitants.",
+        "header": "London"
+    }, {
+        "article": "Paris is the capital and most populous city of France.",
+        "header": "Paris"
+    }, {
+        "article": "Tokyo is the capital of Japan, the center of the Greater Tokyo\r\n    Area, and the most populous metropolitan area in the world.",
+        "header": "Tokyo"
+    }]
+}

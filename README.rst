@@ -1,8 +1,10 @@
 Micro Web Scraper
 =================
+A lightweight recursive HTML web scraper that takes a very simple
+JSON file containing keys & xpaths and packages the response in JSON.
 
-A simple recursive HTML web scraper that takes a JSON file containing
-nexted keys & XPaths and stores the results in JSON.
+
+
 
 keys that startwith '_' are arguments/parameters for the Python requests
 module.  "_url" is a required key.

@@ -5,7 +5,7 @@ import json
 import lxml
 import requests
 
-import webscraper
+from .webscraper import scrape_page
 
 # if xpath:
 #    click.echo(lxml.etree.tostring(etree.xpath(cfg),
@@ -14,9 +14,10 @@ import webscraper
 
 @click.command()
 @click.argument('xpaths_file', type=click.File())
-def main(xpaths_file):
+@click.option('-p', '--page', type=click.File('rb'))
+def main(xpaths_file, page):
     try:
-        result = webscraper.scrape_page(json.load(xpaths_file))
+        result = scrape_page(json.load(xpaths_file), page=page)
         click.echo(json.dumps(result, indent=4, sort_keys=True))
     except (
         EnvironmentError, json.JSONDecodeError,

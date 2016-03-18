@@ -7,4 +7,5 @@ def extract_request_args(xpaths_file):
     :raises: KeyError
     """
     cfg = deepcopy(xpaths_file)
-    return cfg.pop('_url'), {k: v for k, v in cfg.items() if k.startswith('_')}
+    url = cfg.pop('_url', None)
+    return url, {k: v for k, v in cfg.items() if k.startswith('_')}
