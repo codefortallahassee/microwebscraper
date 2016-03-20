@@ -7,17 +7,25 @@ import requests
 
 from .webscraper import scrape_page
 
-# if xpath:
-#    click.echo(lxml.etree.tostring(etree.xpath(cfg),
-#                                   pretty_print=True))
 
 
 @click.command()
-@click.argument('xpaths_file', type=click.File())
-@click.option('-p', '--page', type=click.File('rb'))
-def main(xpaths_file, page):
+@click.argument('-f', '--file', 'xpaths_filename', type=click.File(),
+                help='name of JSON file containing xpaths')
+@click.option('-P', '--page', 'html_filename', type=click.File('rb'),
+              help='name of file containing HTML content')
+@click.option('-x', '--xpath', 'xpath_expr'
+              help='XPATH expression')
+@click.option('-u', '--url',
+              help='URL of web page to scrape')
+def main(xpaths_filename, html_filename, xpath_expr, url):
     try:
-        result = scrape_page(json.load(xpaths_file), page=page)
+        if xpath_expr:
+            
+         or (html_filename and not xpaths_filename):
+        #    click.echo(lxml.etree.tostring(etree.xpath(cfg),
+        #                                   pretty_print=True))
+        result = scrape_page(json.load(xpaths_filename), page=html_filename)
         click.echo(json.dumps(result, indent=4, sort_keys=True))
     except (
         EnvironmentError, json.JSONDecodeError,
