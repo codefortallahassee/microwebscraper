@@ -3,7 +3,17 @@ Micro Web Scraper
 A lightweight recursive HTML web scraper that takes a very simple
 JSON file containing keys & xpaths and packages the response in JSON.
 
+.. code-block::
 
+    Usage: scraper [OPTIONS]
+
+    Options:
+      -f, --file FILENAME  name of JSON file containing xpaths
+      -x, --xpath TEXT     XPATH epxression
+      -u, --url TEXT       URL of HTML page
+      -P, --page FILENAME  name of file containing HTML content
+      -s, --sep BYTES      output list separator
+      --help               Show this message and exit.
 
 
 keys that startwith '_' are arguments/parameters for the Python requests
