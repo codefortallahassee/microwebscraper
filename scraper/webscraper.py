@@ -3,7 +3,7 @@ import re
 
 import lxml
 
-XPATH_AS_STR_RE = re.compile(r'(text\(\)(\)\[\d+\])?|@[^/]+)$')
+XPATH_AS_STR_RE = re.compile(r'(text\(\))|(/@[^/]+)$')
 
 
 def xpath_returns_text(xpath_expr, xpath_as_str_re=XPATH_AS_STR_RE):
