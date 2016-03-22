@@ -23,7 +23,7 @@ def step_and_filename_of_html_page(context, page_filename):
 @then('scraped data should match "{output_filename}"')
 def step_impl(context, output_filename):
     result = runner.invoke(scraper.cli.main, [
-        os.path.join(current_dir, context.xpaths_file),
-        '-p', os.path.join(current_dir, context.page)])
+        '--file', os.path.join(current_dir, context.xpaths_file),
+        '--page', os.path.join(current_dir, context.page)])
     output = json.load(open(os.path.join(current_dir, output_filename)))
     assert json.loads(result.output) == output

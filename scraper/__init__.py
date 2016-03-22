@@ -7,7 +7,6 @@ A simple recursive web scraper
 """
 
 from . import cli
+from . import htmlpage
 from . import htmlparser
-from . import pagerequest
-from . import requestsfile
 from . import webscraper

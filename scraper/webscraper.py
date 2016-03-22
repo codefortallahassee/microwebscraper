@@ -3,11 +3,11 @@ import re
 
 import lxml
 
-from .htmlparser import html2etree
-from .pagerequest import get_page
-from .requestsfile import extract_request_args
-
 XPATH_AS_STR_RE = re.compile(r'(text\(\)(\)\[\d+\])?|@[^/]+)$')
+
+
+def xpath_returns_text(xpath_expr, xpath_as_str_re=XPATH_AS_STR_RE):
+    return xpath_as_str_re.search(xpath_expr)
 
 
 def compile_xpaths(xpaths):
@@ -40,28 +40,20 @@ def scrape(etree, xpaths):
             for k, v in xpaths.items()}
 
 
-def scrape_page(config, page=None):
+def scrape_page(config, etree):
     """Extract data from an Element Tree and put it into a JSON file
 
     The scraper uses recursive XPath expressions and keys defined in
     a JSON file to determine what to pull and where to put it.
 
-    :param config: xpaths to evaluate & keys to store result (can be nested)
-    :type config: dict (JSON compatible)
-    :param page: HTML text, if set to None page is retrieved from theURL
-    :type config: bytes
-    :returns: web scraper results
-    :rtype: dict (JSON compatible)
-    :raises: requests.RequestException
-    :raises: requests.HTTPError
-    :raises: lxml.etree.XPathSyntaxError
-    :raises: lxml.etree.XPathEvalError
-    :raises: lxml.etree.ParserError
-    :raises: UnicodeDecodeError
-    """
-    url, kwargs = extract_request_args(config)
-    page_content = page.read() if page else get_page(url, **kwargs)
-    etree = html2etree(page_content)
+    if page is set to None, the page is retrieved from the "_url' key
+    if the config, else load the page from a file (or stdin)
+    raises:
 
+    Potential Exceptions:
+        requests.RequestException, requests.HTTPError
+        lxml.etree.XPathSyntaxError, lxml.etree.XPathEvalError
+        lxml.etree.ParserError, UnicodeDecodeError
+    """
     xpaths = {k: v for k, v in config.items() if not k.startswith('_')}
     return scrape(etree, compile_xpaths(xpaths))
