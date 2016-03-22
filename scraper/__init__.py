@@ -6,7 +6,5 @@ A simple recursive web scraper
 :license: Apache 2.0, see LICENSE for more details.
 """
 
-from . import cli
 from . import htmlpage
-from . import htmlparser
 from . import webscraper

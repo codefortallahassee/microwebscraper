@@ -6,13 +6,8 @@ import lxml.etree
 import lxml.html
 import requests
 
-from .htmlpage import load_html_page
+from .htmlpage import load_html_page, etree2html
 from .webscraper import scrape_page, xpath_returns_text
-
-
-def etree2html(etree):
-    result = lxml.html.tostring(etree, pretty_print=True)
-    return result.replace(b'&#13;', b'')
 
 
 @click.command()

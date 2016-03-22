@@ -1,6 +1,24 @@
 import requests
 from copy import deepcopy
 
+import lxml.html
+
+
+def etree2html(etree):
+    """renders an Element Tree (lxml.etree) as HTML (bytes)"""
+    result = lxml.html.tostring(etree, pretty_print=True)
+    return result.replace(b'&#13;', b'')
+
+
+def html2etree(tag_soup):
+    """parses HTML (bytes), returns an Element Tree (lxml.etree)
+
+    exceptions:
+        - UnicodeDecodeError
+        - lxml.etree.ParserError
+    """
+    return lxml.html.fromstring(tag_soup)
+
 
 def request_page(url, **kwargs):
     response = requests.get(url, **kwargs)
