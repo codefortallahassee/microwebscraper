@@ -9,7 +9,7 @@ JSON file containing keys & xpaths and packages the response in JSON.
 
     Options:
       -f, --file FILENAME  name of JSON file containing xpaths
-      -x, --xpath TEXT     XPATH epxression
+      -x, --xpath TEXT     XPATH expression
       -u, --url TEXT       URL of HTML page
       -P, --page FILENAME  name of file containing HTML content
       -s, --sep BYTES      output list separator

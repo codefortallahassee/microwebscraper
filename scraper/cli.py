@@ -18,7 +18,7 @@ def etree2html(etree):
 @click.command()
 @click.option('-f', '--file', 'cfg_file', type=click.File(),
               help='name of JSON file containing xpaths')
-@click.option('-x', '--xpath', help='XPATH epxression')
+@click.option('-x', '--xpath', help='XPATH expression')
 @click.option('-u', '--url', help='URL of HTML page')
 @click.option('-P', '--page', type=click.File('rb'),
               help='name of file containing HTML content')
