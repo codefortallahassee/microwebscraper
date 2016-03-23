@@ -11,9 +11,9 @@ def etree2html(etree):
 
 
 def html2etree(tag_soup):
-    """parses HTML (bytes), returns an Element Tree (lxml.etree)
+    """parses HTML (bytes) & returns an Element Tree (lxml.etree)
 
-    exceptions:
+    Potential Exceptions:
         - UnicodeDecodeError
         - lxml.etree.ParserError
     """
@@ -27,13 +27,20 @@ def request_page(url, **kwargs):
 
 
 def get_request_settings(config):
-    """Pull requests.get settings from config dictionary"""
+    """pull requests settings from scraper config (dict)"""
     cfg = deepcopy(config)
     url = cfg.pop('_url', None)
     return url, {k: v for k, v in cfg.items() if k.startswith('_')}
 
 
 def load_html_page(config, page=None, url=None):
+    """load HTML from a file or a URL
+
+    page:   file obj (bytes) with the HTML, if set read/return contents
+    config: dict with keys & xpath expressions (see docs more info)
+            and requests settings (these keys start with an underscore)
+    url:    sets URL, will override the _url setting in config
+    """
     if page:
         return page.read()
 

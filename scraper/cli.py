@@ -7,6 +7,7 @@ import lxml.html
 import requests
 
 from .htmlpage import load_html_page, etree2html
+from .verbosescraper import verbose_scrape
 from .webscraper import scrape_page, xpath_returns_text
 
 
@@ -17,14 +18,24 @@ from .webscraper import scrape_page, xpath_returns_text
 @click.option('-u', '--url', help='URL of HTML page')
 @click.option('-P', '--page', type=click.File('rb'),
               help='name of file containing HTML content')
-@click.option('-s', '--sep', default=b'-', type=bytes,
+@click.option('-s', '--sep', default='-',
               help='output list separator')
-def main(cfg_file, xpath, url, page, sep):
+@click.option('-w', '--width', type=int, default=78,
+              help='output separator width')
+@click.option('-v', '--verbose', is_flag=True,
+              help='display the results for each scraper step')
+def main(cfg_file, xpath, url, page, sep, width, verbose):
+    separator = sep * width + '\n'
+
     try:
         config = json.load(cfg_file) if cfg_file else {}
         etree = lxml.html.fromstring(load_html_page(config, page, url))
         if config:
-            result = scrape_page(config, etree)
+            if verbose:
+                steps, result = verbose_scrape(etree, config, sep=separator)
+                click.echo('\n'.join(steps) + '\n' + separator)
+            else:
+                result = scrape_page(etree, config)
             click.echo(json.dumps(result, indent=4, sort_keys=True))
             return
 
@@ -40,8 +51,8 @@ def main(cfg_file, xpath, url, page, sep):
             click.echo('\n'.join(results))
             return
 
-        separator = sep * 78 + b'\n'
         elements = map(etree2html, results)
+        separator = bytes(separator, 'utf8')
         click.echo(separator + (separator).join(elements) + separator)
 
     except (

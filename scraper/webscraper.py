@@ -7,13 +7,26 @@ XPATH_AS_STR_RE = re.compile(r'(text\(\))|(/@[^/]+)$')
 
 
 def xpath_returns_text(xpath_expr, xpath_as_str_re=XPATH_AS_STR_RE):
-    return xpath_as_str_re.search(xpath_expr)
+    """Does the XPath expression return text, as opposed to a Sequence?
+
+    Returns:
+      - True if the XPath ends with text() or @<attrib-name>
+      - False if the XPath returns a Sequence of items
+    """
+    return bool(xpath_as_str_re.search(xpath_expr))
+
+
+def get_xpath_val(value, xpath, xpath_returns_str=XPATH_AS_STR_RE):
+    """Returns either the text value or a Sequence from XPath result"""
+    return ''.join(value) if xpath_returns_text(xpath) else value
 
 
 def compile_xpaths(xpaths):
-    """
-    :raises: lxml.etree.XPathSyntaxError
-    :raises: lxml.etree.XPathEvalError
+    """Precompile the XPaths in the scraper config file
+
+    Potential Exceptions:
+      - lxml.etree.XPathSyntaxError
+      - lxml.etree.XPathEvalError
     """
     try:
         return {k: lxml.etree.XPath(v) if isinstance(v, str)
@@ -25,14 +38,15 @@ def compile_xpaths(xpaths):
         raise lxml.etree.XPathEvalError(e.msg + '\n' + json.dumps(xpaths))
 
 
-def get_xpath_val(value, xpath, xpath_returns_str=XPATH_AS_STR_RE):
-    return ''.join(value) if xpath_returns_str.search(xpath) else value
-
-
 def scrape(etree, xpaths):
-    """
-    :raises: UnicodeDecodeError
-    :raises: lxml.etree.ParserError
+    """Extract data from an Element Tree and put it into a JSON file
+
+    The scraper uses recursive XPath expressions and keys defined in
+    a JSON file to determine what to pull and where to put it.
+
+    Potential Exceptions:
+        - UnicodeDecodeError
+        - lxml.etree.ParserError
     """
     return {k: get_xpath_val(v(etree), v.path)
             if isinstance(v, lxml.etree.XPath)
@@ -40,20 +54,16 @@ def scrape(etree, xpaths):
             for k, v in xpaths.items()}
 
 
-def scrape_page(config, etree):
-    """Extract data from an Element Tree and put it into a JSON file
+def scrape_page(etree, config, verbose=False, sep=''):
+    """Compile XPaths & scrape data from the Element Tree (lxml.etree)
 
-    The scraper uses recursive XPath expressions and keys defined in
-    a JSON file to determine what to pull and where to put it.
-
-    if page is set to None, the page is retrieved from the "_url' key
-    if the config, else load the page from a file (or stdin)
-    raises:
+    If page is set to None, the page is retrieved from the "_url' key
+    otherwise load the page from a file or stdin.
 
     Potential Exceptions:
-        requests.RequestException, requests.HTTPError
-        lxml.etree.XPathSyntaxError, lxml.etree.XPathEvalError
-        lxml.etree.ParserError, UnicodeDecodeError
+      - requests.RequestException, requests.HTTPError
+      - lxml.etree.XPathSyntaxError, lxml.etree.XPathEvalError
+      - lxml.etree.ParserError, UnicodeDecodeError
     """
     xpaths = {k: v for k, v in config.items() if not k.startswith('_')}
     return scrape(etree, compile_xpaths(xpaths))

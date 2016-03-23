@@ -7,4 +7,5 @@ A simple recursive web scraper
 """
 
 from . import htmlpage
+from . import verbosescraper
 from . import webscraper
