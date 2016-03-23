@@ -12,9 +12,10 @@ JSON file containing keys & xpaths and packages the response in JSON.
       -x, --xpath TEXT     XPATH expression
       -u, --url TEXT       URL of HTML page
       -P, --page FILENAME  name of file containing HTML content
-      -s, --sep BYTES      output list separator
+      -s, --sep TEXT       output list separator
+      -w, --width INTEGER  output separator width
+      -v, --verbose        display the results for each scraper step
       --help               Show this message and exit.
-
 
 keys that startwith '_' are arguments/parameters for the Python requests
 module.  "_url" is a required key.
