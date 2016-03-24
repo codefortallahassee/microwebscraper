@@ -1,7 +1,9 @@
+import json
+import os
 import sys
 
 import click
-import json
+import jsonschema
 import lxml.etree
 import lxml.html
 import requests
@@ -9,6 +11,8 @@ import requests
 from .htmlpage import load_html_page, etree2html
 from .verbosescraper import verbose_scrape
 from .webscraper import scrape_page, xpath_returns_text
+
+SCHEMA_FILENAME = os.path.join(os.path.dirname(__file__), 'scraperschema.json')
 
 
 @click.command()
@@ -29,6 +33,7 @@ def main(cfg_file, xpath, url, page, sep, width, verbose):
 
     try:
         config = json.load(cfg_file) if cfg_file else {}
+        jsonschema.validate(config, json.load(open(SCHEMA_FILENAME)))
         etree = lxml.html.fromstring(load_html_page(config, page, url))
         if config:
             if verbose:
@@ -56,12 +61,14 @@ def main(cfg_file, xpath, url, page, sep, width, verbose):
         click.echo(separator + (separator).join(elements) + separator)
 
     except (
-        EnvironmentError, json.JSONDecodeError,
+        EnvironmentError,
+        json.JSONDecodeError, jsonschema.ValidationError,
         requests.RequestException, requests.HTTPError,
         lxml.etree.ParseError, UnicodeDecodeError,
         lxml.etree.XPathSyntaxError, lxml.etree.XPathEvalError
     ) as exception:
-        click.echo(str(exception), err=True)
+        error = exception.__class__.__name__
+        click.echo('{}: {}'.format(error, exception), err=True)
         sys.exit(1)
 
 if __name__ == '__main__':
