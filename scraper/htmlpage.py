@@ -1,45 +1,67 @@
-import requests
+import sys
 from copy import deepcopy
 
+import lxml.etree
 import lxml.html
+import requests
+
+from .exceptions import (HTMLEncodingIssue, FailedToParseHTML,
+                         FailedToLoadWebPage, RequestsTypeError)
 
 
 def etree2html(etree):
-    """renders an Element Tree (lxml.etree) as HTML (bytes)"""
+    """Renders an Element Tree (lxml.etree) as HTML (bytes)"""
     result = lxml.html.tostring(etree, pretty_print=True)
     return result.replace(b'&#13;', b'')
 
 
 def html2etree(tag_soup):
-    """parses HTML (bytes) & returns an Element Tree (lxml.etree)
+    """Parses HTML (bytes) & returns an Element Tree (lxml.etree)
 
-    Potential Exceptions:
-        - UnicodeDecodeError
-        - lxml.etree.ParserError
+    raises:
+        - HTMLEncodingError
+        - FailedToParseHTML
     """
-    return lxml.html.fromstring(tag_soup)
+    try:
+        return lxml.html.fromstring(tag_soup)
+    except UnicodeDecodeError:
+        raise HTMLEncodingIssue(sys.exc_info()[:2], value=tag_soup)
+    except lxml.etree.ParserError:
+        raise FailedToParseHTML(sys.exc_info()[:2], value=tag_soup)
 
 
 def request_page(url, **kwargs):
-    response = requests.get(url, **kwargs)
-    response.raise_for_status()
-    return response.content
+    """A requests wrapper, retrieves Web Page content (bytes) from a URL
+
+    raises:
+        - RequestForWebPageFailed
+        - RequestsTypeError
+    """
+    try:
+        response = requests.get(url, **kwargs)
+        response.raise_for_status()
+    except requests.RequestException:
+        raise FailedToLoadWebPage(sys.exc_info()[:2], value=(url, kwargs))
+    except TypeError:
+        raise RequestsTypeError(sys.exc_info()[:2], value=(url, kwargs))
+    else:
+        return response.content
 
 
 def get_request_settings(config):
-    """pull requests settings from scraper config (dict)"""
+    """Get requests.get() args & kwargs from scraper config (dict)"""
     cfg = deepcopy(config)
     url = cfg.pop('_url', None)
     return url, {k: v for k, v in cfg.items() if k.startswith('_')}
 
 
 def load_html_page(config, page=None, url=None):
-    """load HTML from a file or a URL
+    """Load HTML from either a file or a URL
 
     page:   file obj (bytes) with the HTML, if set read/return contents
-    config: dict with keys & xpath expressions (see docs more info)
-            and requests settings (these keys start with an underscore)
-    url:    sets URL, will override the _url setting in config
+    config: dict with requests settings (these keys start with an underscore)
+            and the xpath expressions (see docs more info)
+    url:    sets the URL, will override the config '_url' setting
     """
     if page:
         return page.read()

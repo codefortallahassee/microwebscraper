@@ -6,13 +6,14 @@ import click
 import jsonschema
 import lxml.etree
 import lxml.html
-import requests
 
+from .exceptions import ScraperException
 from .htmlpage import load_html_page, etree2html
+from .loadjson import json_load
 from .verbosescraper import verbose_scrape
-from .webscraper import scrape_page, xpath_returns_text
+from .webscraper import do_xpath, scrape_page, xpath_returns_text
 
-SCHEMA_FILENAME = os.path.join(os.path.dirname(__file__), 'scraperschema.json')
+SCHEMA_FILE = os.path.join(os.path.dirname(__file__), 'scraperschema.json')
 
 
 @click.command()
@@ -32,8 +33,8 @@ def main(cfg_file, xpath, url, page, sep, width, verbose):
     separator = sep * width + '\n'
 
     try:
-        config = json.load(cfg_file) if cfg_file else {}
-        jsonschema.validate(config, json.load(open(SCHEMA_FILENAME)))
+        config = json_load(cfg_file) if cfg_file else {}
+        jsonschema.validate(config, json_load(open(SCHEMA_FILE)))
         etree = lxml.html.fromstring(load_html_page(config, page, url))
         if config:
             if verbose:
@@ -48,7 +49,7 @@ def main(cfg_file, xpath, url, page, sep, width, verbose):
             click.echo(etree2html(etree))
             return
 
-        results = etree.xpath(xpath)
+        results = do_xpath(xpath, etree)
         if not results:
             return
 
@@ -59,17 +60,13 @@ def main(cfg_file, xpath, url, page, sep, width, verbose):
         elements = map(etree2html, results)
         separator = bytes(separator, 'utf8')
         click.echo(separator + (separator).join(elements) + separator)
+        return
 
-    except (
-        EnvironmentError,
-        json.JSONDecodeError, jsonschema.ValidationError,
-        requests.RequestException, requests.HTTPError,
-        lxml.etree.ParseError, UnicodeDecodeError,
-        lxml.etree.XPathSyntaxError, lxml.etree.XPathEvalError
-    ) as exception:
-        error = exception.__class__.__name__
-        click.echo('{}: {}'.format(error, exception), err=True)
-        sys.exit(1)
+    except EnvironmentError as exception:
+        click.echo(str(exception))
+    except ScraperException as exception:
+        exception.echo()
+    sys.exit(1)
 
 if __name__ == '__main__':
     main()
