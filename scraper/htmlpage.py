@@ -3,6 +3,7 @@ from copy import deepcopy
 
 import lxml.etree
 import lxml.html
+import lxml.etree
 import requests
 
 from .exceptions import (HTMLEncodingIssue, FailedToParseHTML,
@@ -11,11 +12,10 @@ from .exceptions import (HTMLEncodingIssue, FailedToParseHTML,
 
 def etree2html(etree):
     """Renders an Element Tree (lxml.etree) as HTML (bytes)"""
-    result = lxml.html.tostring(etree, pretty_print=True)
-    return result.replace(b'&#13;', b'')
+    return lxml.etree.tostring(etree, pretty_print=True)
 
 
-def html2etree(tag_soup):
+def html2etree(tag_soup, tidy=False):
     """Parses HTML (bytes) & returns an Element Tree (lxml.etree)
 
     raises:
@@ -23,6 +23,8 @@ def html2etree(tag_soup):
         - FailedToParseHTML
     """
     try:
+        if tidy:
+            tag_soup = tag_soup.replace(b'\n', b'').replace(b'\r', b'')
         return lxml.html.fromstring(tag_soup)
     except UnicodeDecodeError:
         raise HTMLEncodingIssue(sys.exc_info()[:2], value=tag_soup)
