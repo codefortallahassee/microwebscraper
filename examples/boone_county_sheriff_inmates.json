@@ -1,0 +1,13 @@
+{
+    "_url": "https://report.boonecountymo.org/mrcjava/servlet/SH01_MP.I00290s",
+    "inmates": ["//*[@id=\"mrc_main_table\"]//tr", {
+        "last_name": "td[1]/text()",
+        "first_name": "td[2]/text()",
+        "middle_name": "td[3]/text()",
+        "sex": "td[4]/text()",
+        "race": "td[5]/text()",
+        "age": "td[6]/text()",
+        "city": "td[7]/text()",
+        "state": "td[8]/text()"
+    }]
+}
