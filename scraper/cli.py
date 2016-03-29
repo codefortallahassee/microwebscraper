@@ -4,11 +4,9 @@ import sys
 
 import click
 import jsonschema
-import lxml.etree
-import lxml.html
 
 from .exceptions import ScraperException
-from .htmlpage import load_html_page, etree2html
+from .htmlpage import load_html_page, etree2html, html2etree
 from .loadjson import json_load
 from .verbosescraper import verbose_scrape
 from .webscraper import do_xpath, scrape_page, xpath_returns_text
@@ -19,23 +17,20 @@ SCHEMA_FILE = os.path.join(os.path.dirname(__file__), 'scraperschema.json')
 @click.command()
 @click.option('-f', '--file', 'cfg_file', type=click.File(),
               help='name of JSON file containing xpaths')
-@click.option('-x', '--xpath', help='XPATH expression')
+@click.option('-t', '--tidy', is_flag=True,
+              help='tidy HTML (also strips newlines, see docs)')
 @click.option('-u', '--url', help='URL of HTML page')
-@click.option('-P', '--page', type=click.File('rb'),
-              help='name of file containing HTML content')
-@click.option('-s', '--sep', default='-',
-              help='output list separator')
-@click.option('-w', '--width', type=int, default=78,
-              help='output separator width')
 @click.option('-v', '--verbose', is_flag=True,
               help='display the results for each scraper step')
-def main(cfg_file, xpath, url, page, sep, width, verbose):
-    separator = sep * width + '\n'
-
+@click.option('-x', '--xpath', help='XPATH expression')
+@click.option('-P', '--page', type=click.File('rb'),
+              help='name of file containing HTML content')
+def main(cfg_file, tidy, url, verbose, xpath, page):
+    separator = ' ' * 76 + '\n'
     try:
         config = json_load(cfg_file) if cfg_file else {}
         jsonschema.validate(config, json_load(open(SCHEMA_FILE)))
-        etree = lxml.html.fromstring(load_html_page(config, page, url))
+        etree = html2etree(load_html_page(config, page, url), tidy)
         if config:
             if verbose:
                 steps, result = verbose_scrape(etree, config, sep=separator)
