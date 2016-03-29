@@ -12,8 +12,7 @@ JSON file containing keys & xpaths and packages the response in JSON.
       -x, --xpath TEXT     XPATH expression
       -u, --url TEXT       URL of HTML page
       -P, --page FILENAME  name of file containing HTML content
-      -s, --sep TEXT       output list separator
-      -w, --width INTEGER  output separator width
+      -t, --tidy           tidy HTML
       -v, --verbose        display the results for each scraper step
       --help               Show this message and exit.
 
