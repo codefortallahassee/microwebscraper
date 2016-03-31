@@ -6,13 +6,13 @@ Feature: scrape data from an HTML file
 
 
     Scenario: get the H1 header from HTML file
-        Given a config file named "config\\skeleton_header.json"
-        And a HTML file named "data\\w3c_html5_skeleton.html"
-        When page is scraped
-        Then the data should match "output\skeleton_header.json"
+        Given a configuration file "config\\skeleton_header.json"
+        And a HTML page file "data\\w3c_html5_skeleton.html"
+        When the page is scraped
+        Then the output should match the file "output\skeleton_header.json"
 
     Scenario: get a list of article titles and contents from HTML file
-        Given a config file named "config\\skeleton_articles.json"
-        And a HTML file named "data\\w3c_html5_skeleton.html"
-        When page is scraped
-        Then the data should match "output\skeleton_articles.json"
+        Given a configuration file "config\\skeleton_articles.json"
+        And a HTML page file "data\\w3c_html5_skeleton.html"
+        When the page is scraped
+        Then the output should match the file "output\skeleton_articles.json"

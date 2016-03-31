@@ -1,0 +1,5 @@
+
+    Scenario: using a URL and a config file get the H1 header
+        Given a config file named "config\\skeleton_articles.json
+        And a URL "http://www.travelingfrontiers.com/microwebscraper/w3c_html5_skeleton.html"
+        Then scraped data should match "output\skeleton_header.json"
