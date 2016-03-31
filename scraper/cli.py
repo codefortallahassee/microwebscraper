@@ -4,6 +4,7 @@ import sys
 
 import click
 import jsonschema
+from toolz import curry
 
 from .exceptions import ScraperException
 from .htmlpage import load_html_page, etree2html, html2etree
@@ -26,7 +27,7 @@ SCHEMA_FILE = os.path.join(os.path.dirname(__file__), 'scraperschema.json')
 @click.option('-P', '--page', type=click.File('rb'),
               help='name of file containing HTML content')
 def main(cfg_file, tidy, url, verbose, xpath, page):
-    separator = ' ' * 76 + '\n'
+    separator = '\n' + '-' * 76 + '\n'
     try:
         config = json_load(cfg_file) if cfg_file else {}
         jsonschema.validate(config, json_load(open(SCHEMA_FILE)))
@@ -41,7 +42,7 @@ def main(cfg_file, tidy, url, verbose, xpath, page):
             return
 
         if not xpath:
-            click.echo(etree2html(etree))
+            click.echo(etree2html(etree, tidy))
             return
 
         results = do_xpath(xpath, etree)
@@ -52,7 +53,7 @@ def main(cfg_file, tidy, url, verbose, xpath, page):
             click.echo('\n'.join(results))
             return
 
-        elements = map(etree2html, results)
+        elements = map(curry(etree2html, tidy=tidy), results)
         separator = bytes(separator, 'utf8')
         click.echo(separator + (separator).join(elements) + separator)
         return

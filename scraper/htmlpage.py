@@ -1,43 +1,29 @@
 import sys
 from copy import deepcopy
-
 import lxml.etree
 import lxml.html
-import lxml.etree
+import lxml.html.soupparser
+import lxml.html.html5parser
 import requests
 
-from .exceptions import (HTMLEncodingIssue, FailedToParseHTML,
-                         FailedToLoadWebPage, RequestsTypeError)
+from .exceptions import FailedToLoadWebPage, RequestsTypeError
 
 
-def etree2html(etree):
+def etree2html(etree, tidy):
     """Renders an Element Tree (lxml.etree) as HTML (bytes)"""
-    return lxml.etree.tostring(etree, pretty_print=True)
+    return lxml.etree.tostring(etree, pretty_print=tidy).replace(b'&#13;', b'')
 
 
 def html2etree(tag_soup, tidy=False):
-    """Parses HTML (bytes) & returns an Element Tree (lxml.etree)
-
-    raises:
-        - HTMLEncodingError
-        - FailedToParseHTML
-    """
-    try:
-        if tidy:
-            tag_soup = tag_soup.replace(b'\n', b'').replace(b'\r', b'')
-        return lxml.html.fromstring(tag_soup)
-    except UnicodeDecodeError:
-        raise HTMLEncodingIssue(sys.exc_info()[:2], value=tag_soup)
-    except lxml.etree.ParserError:
-        raise FailedToParseHTML(sys.exc_info()[:2], value=tag_soup)
+    """Parses HTML (bytes) & returns an Element Tree (lxml.etree)"""
+    parser = lxml.etree.HTMLParser(remove_blank_text=tidy)
+    return lxml.html.fromstring(tag_soup, parser=parser)
 
 
 def request_page(url, **kwargs):
     """A requests wrapper, retrieves Web Page content (bytes) from a URL
 
-    raises:
-        - RequestForWebPageFailed
-        - RequestsTypeError
+    raises: RequestForWebPageFailed, RequestsTypeError
     """
     try:
         response = requests.get(url, **kwargs)

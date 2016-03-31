@@ -29,7 +29,7 @@ def compile_xpath(xpath, key=None):
     try:
         return lxml.etree.XPath(xpath)
     except lxml.etree.XPathSyntaxError:
-        raise InvalidXPathExpression(sys.exc_info[:2], value=xpath, key=key)
+        raise InvalidXPathExpression(sys.exc_info()[:2], value=xpath, key=key)
 
 
 def compile_xpaths(xpaths):
@@ -44,7 +44,7 @@ def do_xpath(xpath, etree):
     try:
         return etree.xpath(xpath)
     except (lxml.etree.XPathSyntaxError, lxml.etree.XPathEvalError):
-        raise InvalidXPathExpression(sys.exc_info[:2], value=xpath)
+        raise InvalidXPathExpression(sys.exc_info()[:2], value=xpath)
 
 
 def apply_xpath(xpath, etree, key=None):
@@ -52,7 +52,7 @@ def apply_xpath(xpath, etree, key=None):
     try:
         return xpath(etree)
     except lxml.etree.XPathEvalError:
-        raise InvalidXPathExpression(sys.exc_info[:2], value=xpath, key=key)
+        raise InvalidXPathExpression(sys.exc_info()[:2], value=xpath, key=key)
 
 
 def scrape(etree, xpaths):
