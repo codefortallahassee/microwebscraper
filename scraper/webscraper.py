@@ -4,7 +4,7 @@ import sys
 import lxml
 import lxml.etree
 
-from .exceptions import InvalidXPathExpression
+from exceptions import InvalidXPathExpression
 
 XPATH_AS_STR_RE = re.compile(r'(text\(\))|(/@[^/]+)$')
 
@@ -67,7 +67,7 @@ def scrape(etree, xpaths):
             for k, v in xpaths.items()}
 
 
-def scrape_page(etree, config, verbose=False, sep=''):
+def scrape_page(etree, config, verbose=False):
     """Compile XPaths & scrape data from the Element Tree (lxml.etree)
 
     If page is set to None, the page is retrieved from the "_url' key
