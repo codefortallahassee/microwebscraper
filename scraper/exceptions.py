@@ -12,7 +12,7 @@ class ScraperException(Exception):
 
     def __init__(self, *args, **kwargs):
         self.disp_width = 76
-        self.value = kwargs.pop('key', None)
+        self.key = kwargs.pop('key', None)
         self.value = kwargs.pop('value', None)
         self.filename = kwargs.pop('filename', None)
         try:
@@ -53,7 +53,7 @@ class ScraperException(Exception):
         except AttributeError:
             return
 
-        pointer = ''
+        pointer = '^'
         start_pos, stop_pos = None, None
         if column > self.disp_width and column < len(visible_text):
             start_pos = column - int(self.disp_width / 2) - 1
@@ -61,30 +61,6 @@ class ScraperException(Exception):
             visible_text = visible_text[start_pos:stop_pos]
         pointer = ' ' * (column - 1) + '^'
         click.secho(visible_text + '\n' + pointer, fg='yellow', bold=True)
-
-
-class FailedToParseHTML(ScraperException, lxml.etree.ParseError):
-    """Error while parsing HTML document with lxml
-
-    If you are getting this error you may want to consider using a
-    different parser. Three differnt parsers are supported in lxml:
-    lxml.html, soupparser & html5parser.   soupparser & html5parser
-    have better support for tag soup.
-
-    Reference: http://lxml.de/parsing.html#parsing-html
-    """
-
-
-class HTMLEncodingIssue(UnicodeDecodeError):
-    """UnicodeDecodeError: Error parsing the HTML document with lxml
-
-    If you are getting this error you may want to conider using
-    soupparser if you are not already using it since it has the best
-    support for encoding detection with HTML pages that do not
-    (correctly) declare their encoding.
-
-    Reference: http://lxml.de/elementsoup.htm
-    """
 
 
 class FailedToLoadWebPage(ScraperException, requests.RequestException):
@@ -95,7 +71,7 @@ class FailedToLoadWebPage(ScraperException, requests.RequestException):
 
 
 class RequestsTypeError(ScraperException, TypeError):
-    """RequestFailed: Wrong argument types supplied to requests module
+    """RequestFailed: Wrong argument type supplied to requests module
 
     Reference: http://docs.python-requests.org/en/master/api
     """
@@ -138,9 +114,10 @@ class DataIsNotJSON(ScraperException, json.JSONDecodeError):
         if match:
             line, column = map(int, match.groups())
             return self.value.splitlines()[line - 1], column
+        return self.value, 0
 
 
-class InvalidXPathExpression(ScraperException, lxml.etree.XPathSyntaxError):
+class InvalidXPathExpression(ScraperException):
     """Not a valid XPath 1.0 expression"""
 
     xpath_step_sep_re = re.compile(r'(?<!\\)/{1,2}')
@@ -165,14 +142,16 @@ class InvalidXPathExpression(ScraperException, lxml.etree.XPathSyntaxError):
         regex = self.__class__.xpath_step_sep_re
         step_ends = [i.start() for i in regex.finditer(xpath)]
         if not step_ends:
-            return
+            return self.value, 0
 
         if step_ends[0] == 0:
             del step_ends[0]
 
-        last_step = 0
+        last_step = self.value, 0
         for end_pos in step_ends + [None]:
             result = self._test_xpath_fragment(xpath[:end_pos], last_step)
             if result:
                 return self.value, result + 1
             last_step = end_pos
+
+        return self.value, 0
