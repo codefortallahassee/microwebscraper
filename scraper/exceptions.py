@@ -4,7 +4,6 @@ import re
 import click
 import jsonschema
 import lxml.etree
-import requests
 
 
 class ScraperException(Exception):
@@ -63,7 +62,7 @@ class ScraperException(Exception):
         click.secho(visible_text + '\n' + pointer, fg='yellow', bold=True)
 
 
-class FailedToLoadWebPage(ScraperException, requests.RequestException):
+class FailedToLoadWebPage(ScraperException):
     """RequestException: Error retrieving HTML from a URL using requests.get()
 
     Reference: http://docs.python-requests.org/en/master/api
