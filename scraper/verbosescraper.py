@@ -1,13 +1,36 @@
 from copy import deepcopy
 
+import click
+
 from .webscraper import do_xpath, xpath_returns_text
+
+LABEL_COLOR = 'green'
+SEPARATOR_CHAR = '-'
+SEPARATOR_SIZE = 76
+SEPARATOR_COLOR = 'yellow'
+DEFAULT_SEPARATOR = click.style(SEPARATOR_CHAR * SEPARATOR_SIZE,
+                                fg=SEPARATOR_COLOR)
 
 
 def show_keys(keys):
     return ''.join(map('[{!r}]'.format, keys))
 
 
-def verbose_scrape(etree, xpaths, keys=None, xpath=None, steps=None, sep='--'):
+def plain_label(label):
+    return label
+
+
+def color_label(label, color=LABEL_COLOR):
+    return click.style(label, color)
+
+
+def color_separator(sepchar=SEPARATOR_CHAR, sepsize=SEPARATOR_SIZE,
+                    sepcolor=SEPARATOR_COLOR):
+    return click.style(sepchar * sepsize, fg=sepcolor)
+
+
+def verbose_scrape(etree, xpaths, keys=None, xpath=None, steps=None,
+                   sep='', label=plain_label):
     data = {}
     if keys is None:
         keys, xpath, steps = [], [], []
@@ -19,9 +42,9 @@ def verbose_scrape(etree, xpaths, keys=None, xpath=None, steps=None, sep='--'):
                 data[key] = ''.join(data[key])
             steps.append('\n'.join((
                 '',
-                '  key:  ' + show_keys(keys + [key]),
-                '  xpath:' + '/'.join(xpath + [value]),
-                '  value:' + data[key]
+                label('  key:  ') + show_keys(keys + [key]),
+                label('  xpath:') + '/'.join(xpath + [value]),
+                label('  value:') + data[key]
             )))
         else:
             keys.append(key)
@@ -30,9 +53,10 @@ def verbose_scrape(etree, xpaths, keys=None, xpath=None, steps=None, sep='--'):
             nodes = do_xpath(value[0], etree)
             steps.append('\n'.join((
                 sep,
-                'key:     ' + show_keys(keys),
-                'xpath:   ' + '/'.join(xpath),
-                'elements: <{}> * {}'.format(nodes[0].tag, len(nodes)),
+                label('key:      ') + show_keys(keys),
+                label('xpath:    ') + '/'.join(xpath),
+                label('elements: ') + '<{}> * {}'.format(nodes[0].tag,
+                                                         len(nodes)),
                 sep
             )))
             for n, node in enumerate(nodes):
