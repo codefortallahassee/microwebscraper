@@ -4,7 +4,7 @@ import sys
 import lxml
 import lxml.etree
 
-from exceptions import InvalidXPathExpression
+from .exceptions import InvalidXPathExpression
 
 XPATH_AS_STR_RE = re.compile(r'(text\(\))|(/@[^/]+)$')
 
