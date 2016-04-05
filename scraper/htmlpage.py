@@ -7,17 +7,21 @@ import lxml.html.html5parser
 import requests
 
 from .exceptions import FailedToLoadWebPage, RequestsTypeError
+from .htmltidy import walk_etree
 
 
-def etree2html(etree, tidy):
+def dump_etree_html(etree, tidy=False, indent=True):
     """Renders an Element Tree (lxml.etree) as HTML (bytes)"""
-    return lxml.etree.tostring(etree, pretty_print=tidy).replace(b'&#13;', b'')
+    if tidy:
+        return '\n'.join(i for i in walk_etree(etree, indent))
+    else:
+        html = lxml.etree.tostring(etree, encoding='unicode')
+        return html.replace('&#13;', '')
 
 
-def html2etree(tag_soup, tidy=False):
+def html2etree(tag_soup):
     """Parses HTML (bytes) & returns an Element Tree (lxml.etree)"""
-    parser = lxml.etree.HTMLParser(remove_blank_text=tidy)
-    return lxml.html.fromstring(tag_soup, parser=parser)
+    return lxml.html.fromstring(tag_soup)
 
 
 def request_page(url, **kwargs):

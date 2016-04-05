@@ -1,9 +1,11 @@
-Feature: scrape data from an HTML file
-    As an analyst or developer
+Feature: scrape data from an HTML file using a JSON configuration file
+    As an analyst, developer or end-user
     I want to scrape data from web pages using just JSON & XPath 1.0
-    So that I can quickly build applications that use the data in new ways
-    And if a web page changes I want to be able to fix it by only modify a simple JSON file, not the underlying code.
-
+    And I want the scraped values to be returned in JSON in names that I define
+    So that I can quickly build reliable web scrapers without touching code
+    And without learning specialized syntax
+    So I can focus my time on real world usage of the data, not on scraping it
+    And when web pages change I can quickly reconfigure the scraper to match.
 
     Scenario: get the H1 header from HTML file
         Given a configuration file "config\\skeleton_header.json"

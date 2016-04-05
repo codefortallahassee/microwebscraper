@@ -1,15 +1,13 @@
-Feature: load, format & display HTML content from a file
-    As a developer, I want to view the HTML offline
-    And as a tester, I want to be able to test offline
+Feature: load, parse & display HTML content from a file
+    As a developer, tester or end-user
+    I want to work with the HTML pages offline
     So that I am not dependent on an Internet connection
-    And so that I don't have to wait for a HTTP request to complete
-    And so I can output highly readable HTML text from the command-line
+    And do not have to wait for HTTP requests to complete
 
-
-    Scenario: format & display HTML from a file
-        Given a HTML page file "data\\tiny_page.html"
-        When the tidy option is selected
-        Then the output should match the file "output\tidy_tiny_page.html"
+    Scenario: display HTML file
+        Given a HTML page file "data\broken_page.html"
+        When the page is parsed
+        Then the output should match the file "output\parsed_broken_page.html"
 
     Scenario: gracefully handle non-existant HTML file
         Given a HTML page file "oops.html"
