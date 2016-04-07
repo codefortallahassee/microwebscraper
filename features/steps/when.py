@@ -23,6 +23,23 @@ def step_scrape_page(context):
         '--page', os.path.join(current_dir, context.page)]).output
 
 
+@when('the page is scraped with the verbose option')
+def step_verbose_scrape_page(context):
+    context.output = runner.invoke(scraper.cli.main, [
+        '--file', os.path.join(current_dir, context.cfg_file),
+        '--page', os.path.join(current_dir, context.page),
+        '--verbose']).output
+
+
+@when('When the page is scraped with verbose option and keys colored yellow')
+def step_verbose_scrape_page_with_yellow_keys(context):
+    context.output = runner.invoke(scraper.cli.main, [
+        '--file', os.path.join(current_dir, context.cfg_file),
+        '--page', os.path.join(current_dir, context.page),
+        '--keycolor', 'yellow',
+        '--verbose']).output
+
+
 @when('the page is parsed')
 def step_parsed_html(context):
     context.output = runner.invoke(scraper.cli.main, [
