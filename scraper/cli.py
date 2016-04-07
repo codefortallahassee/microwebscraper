@@ -9,8 +9,7 @@ import jsonschema
 from .exceptions import ScraperException
 from .htmlpage import dump_etree_html, load_html_page, html2etree
 from .loadjson import json_load
-from .verbosescraper import (verbose_scrape, plain_label, color_label,
-                             color_separator)
+from .verbosescraper import verbose_scrape, text, color_label, color_separator
 from .webscraper import do_xpath, scrape_page, xpath_returns_text
 
 CONFIG_SCHEMA = 'scraperschema.json'
@@ -63,17 +62,17 @@ def main(cfg_file, indent, tidy, url, verbose, xpath, page, raw,
 
         elif config:
             if verbose:
-                label = (plain_label if keycolor is None else
-                         partial(color_label(color=keycolor)))
-                steps, result = verbose_scrape(etree, config, sep, label)
-                click.echo('{}\n{}'.format('\n'.join(steps), sep))
+                label = (text if keycolor is None else
+                         partial(color_label, color=keycolor))
+                for line in verbose_scrape(etree, config, sep, label):
+                    click.echo(line)
             else:
                 result = scrape_page(etree, config)
-            click.echo(json.dumps(result, indent, sort_keys=True))
+                click.echo(json.dumps(result, indent, sort_keys=True))
         else:
             click.echo(dump_etree_html(etree, tidy, indent))
 
-    except (EnvironmentError, UnicodeDecodeError) as e:
+    except (EnvironmentError, UnicodeDecodeError, TypeError) as e:
         click.echo(str(e))
         sys.exit(1)
     except ScraperException as exception:
