@@ -11,8 +11,4 @@ Page content length: 179
   value: London is the capital city of England. It is the most populous
     city in the United Kingdom, with a metropolitan area of over 13
     million inhabitants.
-
-  key:   ['articles'][0]['header']
-  xpath: (//article[1])[1]/h2/text()
-  value: London
 ----------------------------------------------------------------------------

@@ -1,6 +1,5 @@
 {
     "articles": ["//article[1]", {
-        "article": "p/text()",
-        "header": "h2/text()"
+        "article": "p/text()"
     }]
 }
