@@ -1,23 +1,20 @@
-import json
 import os
 import sys
-from functools import partial
 
 import click
-import jsonschema
 
 from .exceptions import ScraperException
 from .htmlpage import dump_etree_html, load_html_page, html2etree
-from .loadjson import json_load
-from .verbosescraper import verbose_scrape, text, color_label, color_separator
+from .loadjson import json_load, validate_json, dump_json
+from .verbosescraper import verbose_scrape, color_label, color_separator
 from .webscraper import do_xpath, scrape_page, xpath_returns_text
 
 CONFIG_SCHEMA = 'scraperschema.json'
 
 
 @click.command()
-@click.option('-f', '--file', 'cfg_file', type=click.File(),
-              help='name of JSON file containing xpaths')
+@click.option('-c', '--config', type=click.File(),
+              help='name of JSON config file containing request & xpath info')
 @click.option('-i', '--indent', type=click.IntRange(min=0, max=8), default=2,
               help='indent size for output')
 @click.option('-t', '--tidy', is_flag=True,
@@ -26,29 +23,23 @@ CONFIG_SCHEMA = 'scraperschema.json'
 @click.option('-v', '--verbose', is_flag=True,
               help='display the results for each scraper step')
 @click.option('-x', '--xpath', help='XPATH expression')
-@click.option('-P', '--page', type=click.File('rb'),
+@click.option('-p', '--page', type=click.File('rb'),
               help='name of file containing HTML content')
 @click.option('--raw', is_flag=True, help='bypass parser, output raw HTML')
-@click.option('--keycolor', help='field colors (used by verbose)')
-@click.option('--sepchar', default='-',
-              help='separator character (used by verbose)')
-@click.option('--sepsize', type=click.IntRange(min=0, max=300), default=76,
-              help='number of characters in separator (used by verbose)')
-@click.option('--sepcolor', default='yellow',
-              help='separator color (used by verbose)')
-def main(cfg_file, indent, tidy, url, verbose, xpath, page, raw,
-         keycolor, sepchar, sepsize, sepcolor):
+def main(config, indent, tidy, url, verbose, xpath, page, raw):
     config_schema = os.path.join(os.path.dirname(__file__), CONFIG_SCHEMA)
     try:
-        config = json_load(cfg_file) if cfg_file else {}
-        jsonschema.validate(config, json_load(open(config_schema)))
-        html = load_html_page(config, page, url)
+        if config:
+            cfg = json_load(config)
+            validate_json(cfg, json_load(open(config_schema)))
+        else:
+            cfg = {}
+        html = load_html_page(cfg, page, url)
         if raw:
             return click.echo(html)
 
         etree = html2etree(html)
-        sep = (color_separator(sepchar, sepsize, sepcolor)
-               if sepcolor else sepchar * sepsize)
+        sep = color_separator()
 
         if xpath:
             results = do_xpath(xpath, etree)
@@ -62,17 +53,15 @@ def main(cfg_file, indent, tidy, url, verbose, xpath, page, raw,
 
         elif config:
             if verbose:
-                label = (text if keycolor is None else
-                         partial(color_label, color=keycolor))
-                for line in verbose_scrape(etree, config, sep, label):
+                for line in verbose_scrape(etree, cfg, sep, color_label):
                     click.echo(line)
             else:
-                result = scrape_page(etree, config)
-                click.echo(json.dumps(result, indent, sort_keys=True))
+                result = scrape_page(etree, cfg)
+                click.echo(dump_json(result, indent, tidy, sort_keys=True))
         else:
             click.echo(dump_etree_html(etree, tidy, indent))
 
-    except (EnvironmentError, UnicodeDecodeError, TypeError) as e:
+    except (EnvironmentError, UnicodeDecodeError) as e:
         click.echo(str(e))
         sys.exit(1)
     except ScraperException as exception:

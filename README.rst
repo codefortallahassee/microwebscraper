@@ -8,13 +8,16 @@ JSON file containing keys & xpaths and packages the response in JSON.
     Usage: scraper [OPTIONS]
 
     Options:
-      -f, --file FILENAME  name of JSON file containing xpaths
-      -x, --xpath TEXT     XPATH expression
-      -u, --url TEXT       URL of HTML page
-      -P, --page FILENAME  name of file containing HTML content
-      -t, --tidy           tidy HTML
-      -v, --verbose        display the results for each scraper step
-      --help               Show this message and exit.
+      -c, --config FILENAME       name of JSON config file containing request &
+                                  xpath info
+      -i, --indent INTEGER RANGE  indent size for output
+      -t, --tidy                  tidy HTML (normalizes space & indent)
+      -u, --url TEXT              URL of HTML page
+      -v, --verbose               display the results for each scraper step
+      -x, --xpath TEXT            XPATH expression
+      -p, --page FILENAME         name of file containing HTML content
+      --raw                       bypass parser, output raw HTML
+      --help                      Show this message and exit.
 
 keys that startwith '_' are arguments/parameters for the Python requests
 module.  "_url" is a required key.
