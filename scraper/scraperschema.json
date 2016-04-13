@@ -2,12 +2,17 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Micro Web Scraper",
     "description": "describes requests.get() args/kwargs & nested XPaths",
-    "$ref": "#/definitions/xpath_object",
+    "type": "object",
     "properties": {
         "_url":     { "type": "string" },
         "_params":  { "type": "object" },
         "_headers": { "type": "object" }
     },
+    "patternProperties": {
+        "^[^_].+": { "anyOf": [
+            { "$ref": "#/definitions/xpath" },
+            { "$ref": "#/definitions/xpath_sequence" }
+    ]}},
     "additionalProperties": false,
     "definitions": {
         "xpath": { "type": "string" },
