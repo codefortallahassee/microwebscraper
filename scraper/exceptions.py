@@ -1,8 +1,6 @@
-import json
 import re
 
 import click
-import jsonschema
 import lxml.etree
 
 
@@ -76,8 +74,8 @@ class RequestsTypeError(ScraperException, TypeError):
     """
 
 
-class InvalidScraperConfig(ScraperException, jsonschema.ValidationError):
-    """Scraper configuration failed to validate against the JSON schema
+class JSONDataValidationError(ScraperException):
+    """JSON failed validation against the schema
 
     References:
         - scraperschema.json
@@ -103,7 +101,7 @@ class InvalidScraperConfig(ScraperException, jsonschema.ValidationError):
         click.echo('\n' + self.style_class_and_exc_name())
 
 
-class DataIsNotJSON(ScraperException, json.JSONDecodeError):
+class NotValidJSON(ScraperException):
     """Data being deserialized is not a valid JSON document"""
 
     error_position = re.compile(r'line\s(\d+)\s+column\s(\d+)')
